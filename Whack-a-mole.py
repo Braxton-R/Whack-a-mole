@@ -45,10 +45,21 @@ class WhackAMole(QWidget):
                 self.layout.addWidget(button, row, col)
 
     def button_clicked(self, row, col):
-        pass
+        print(f'Button at ({row}, {col}) clicked')
+        button = self.sender()
+        if button.text() == 'MOLE':
+            self.score += 1
+            self.move_mole()
 
+    # Gets user input for a time and starts a timer for that time
     def start_timer(self):
-        pass
+        time, ok = QInputDialog.getInt(self, 'Timer', 'Enter a time between 10 and 60 seconds', min = 10, max = 60)
+        if ok:
+            timer = time*1000
+            # Ends game in a certain time period
+            QTimer.singleShot(timer, self.end_game)
+        else:
+            sys.exit(app.exec_())
 
     def mole_clicked(self):
         pass
@@ -57,7 +68,8 @@ class WhackAMole(QWidget):
         pass
 
     def end_game(self):
-        pass
+        QMessageBox.information(self, 'Game Over!', 'Game over!')
+        sys.exit(app.exec_())
 
     def get_score(self):
         pass            
