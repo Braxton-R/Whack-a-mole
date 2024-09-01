@@ -36,8 +36,13 @@ class WhackAMole(QWidget):
 
         # Creates a grid of buttons using create_buttons function
         self.create_buttons()
+
+        # Creates a repeating timer that goes off every second
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.move_mole)
+        self.timer.start(1000)
         
-        self.move_mole()
+        
 
         self.setLayout(self.layout)
         self.show()
@@ -58,6 +63,7 @@ class WhackAMole(QWidget):
         if button.text() == 'MOLE':
             button.setText('')
             self.score += 1
+            self.update_score()
             self.move_mole()
 
     # Gets user input for a time and starts a timer for that time
@@ -71,9 +77,14 @@ class WhackAMole(QWidget):
             sys.exit(app.exec_())
 
     def move_mole(self):
+        # Clears previous MOLE button
+        if self.current_mole_button:
+            self.current_mole_button.setText('')
+        
         # Randomly selects a button and turns text to 'MOLE'
         row = random.randint(self.MIN_NUM_OF_ROWS,self.MAX_NUM_OF_ROWS)
         col = random.randint(self.MIN_NUM_OF_COLS,self.MAX_NUM_OF_COLS)
+        self.current_mole_button = self.buttons[row][col]
         self.buttons[row][col].setText('MOLE')
             
     def end_game(self):
@@ -85,6 +96,10 @@ class WhackAMole(QWidget):
     def get_score(self):
         with open('score.txt', 'w') as file:
             file.write(f'You got a score of: {self.score}')
+
+    # Updates score label
+    def update_score(self):
+        self.score_label.setText(f'Score: {self.score}')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
