@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import QTimer
 import random
 
 class WhackAMole(QWidget):
@@ -37,11 +37,10 @@ class WhackAMole(QWidget):
         # Creates a grid of buttons using create_buttons function
         self.create_buttons()
 
-        # Creates a repeating timer that goes off every second
+        # Creates a repeating timer that goes off every 1000 milliseconds
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.move_mole)
         self.timer.start(1000)
-        
         
 
         self.setLayout(self.layout)
@@ -60,6 +59,7 @@ class WhackAMole(QWidget):
 
     def button_clicked(self):
         button = self.sender()
+        # Increases score if the button clicked has the 'MOLE' in it
         if button.text() == 'MOLE':
             button.setText('')
             self.score += 1
@@ -81,11 +81,15 @@ class WhackAMole(QWidget):
         if self.current_mole_button:
             self.current_mole_button.setText('')
         
-        # Randomly selects a button and turns text to 'MOLE'
-        row = random.randint(self.MIN_NUM_OF_ROWS,self.MAX_NUM_OF_ROWS)
-        col = random.randint(self.MIN_NUM_OF_COLS,self.MAX_NUM_OF_COLS)
-        self.current_mole_button = self.buttons[row][col]
-        self.buttons[row][col].setText('MOLE')
+        while True:
+            # Randomly selects a button and turns text to 'MOLE'
+            row = random.randint(self.MIN_NUM_OF_ROWS,self.MAX_NUM_OF_ROWS)
+            col = random.randint(self.MIN_NUM_OF_COLS,self.MAX_NUM_OF_COLS)
+            new_mole_button = self.buttons[row][col]
+            if new_mole_button != self.current_mole_button:
+                self.current_mole_button = new_mole_button
+                self.current_mole_button.setText('MOLE')
+                break
             
     def end_game(self):
         QMessageBox.information(self, 'Game Over!', 'Game over!')
