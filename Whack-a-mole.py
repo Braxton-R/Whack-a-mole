@@ -16,12 +16,19 @@ class WhackAMole(QWidget):
         # -1 Because the computer starts counting from 0, not 1
         self.MAX_NUM_OF_ROWS = self.NUM_OF_ROWS - 1
         self.MAX_NUM_OF_COLS = self.NUM_OF_COLS - 1
+        # How often the mole is moved in milliseconds
+        self.MOVE_MOLE_TIME = 1000
+        # Constant size of square buttons
+        self.BUTTON_SIZE = 150
+        # Constants for the min and max time frame that can be inputted at the start of the game
+        self.MIN_GAME_TIME = 10
+        self.MAX_GAME_TIME = 60
         # Value that keeps track of the score
         self.score = 0
         # Value that keeps track of the current mole position
         self.current_mole_button = None
         # Starts a timer
-        # Length of time depends on user imput
+        # Length of time depends on user input
         self.start_timer()
         self.init_ui()
         
@@ -41,10 +48,10 @@ class WhackAMole(QWidget):
         # Creates a grid of buttons using create_buttons function
         self.create_buttons()
 
-        # Creates a repeating timer that goes off every 1000 milliseconds
+        # Creates a repeating timer that moves the mole
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.move_mole)
-        self.timer.start(1000)
+        self.timer.start(self.MOVE_MOLE_TIME)
         
 
         self.setLayout(self.layout)
@@ -58,7 +65,7 @@ class WhackAMole(QWidget):
         for row in range(self.NUM_OF_ROWS):
             for col in range(self.NUM_OF_COLS):
                 button = self.buttons[row][col]
-                button.setFixedSize(150,150)
+                button.setFixedSize(self.BUTTON_SIZE,self.BUTTON_SIZE)
                 button.clicked.connect(lambda ch, row=row, col=col: self.button_clicked())
                 self.layout.addWidget(button, row, col)
 
@@ -78,8 +85,9 @@ class WhackAMole(QWidget):
     # Gets user input for a time and starts a timer for that time
     def start_timer(self):
         # Prompts the user to input a time between 10 and 60 seconds for the game duration
-        time, ok = QInputDialog.getInt(self, 'Timer', 'Enter a time between 10 and 60 seconds', min = 10, max = 60)
+        time, ok = QInputDialog.getInt(self, 'Timer', f'Enter a time between {self.MIN_GAME_TIME} and {self.MAX_GAME_TIME} seconds', min = self.MIN_GAME_TIME, max = self.MAX_GAME_TIME)
         if ok:
+            # times 1000 to convert time inputted to milliseconds
             TIMER = time*1000
             # Ends game in a certain time period
             QTimer.singleShot(TIMER, self.end_game)
@@ -108,7 +116,7 @@ class WhackAMole(QWidget):
         self.get_score()
         sys.exit(app.exec_())
 
-    # Stores the score variable in a seperate txt file
+    # Stores the score variable in a separate txt file
     def get_score(self):
         with open('score.txt', 'w') as file:
             file.write(f'You got a score of: {self.score}')
