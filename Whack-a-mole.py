@@ -8,6 +8,7 @@ import random
 class WhackAMole(QWidget):
     def __init__(self):
         super().__init__()
+        # CONSTANTS
         self.NUM_OF_ROWS = 3
         self.NUM_OF_COLS = 3
         self.MIN_NUM_OF_ROWS = 0
@@ -15,13 +16,16 @@ class WhackAMole(QWidget):
         # -1 Because the computer starts counting from 0, not 1
         self.MAX_NUM_OF_ROWS = self.NUM_OF_ROWS - 1
         self.MAX_NUM_OF_COLS = self.NUM_OF_COLS - 1
+        # Value that keeps track of the score
         self.score = 0
+        # Value that keeps track of the current mole position
         self.current_mole_button = None
-        # Starts timer
+        # Starts a timer
+        # Length of time depends on user imput
         self.start_timer()
         self.init_ui()
         
-    # Set up the main layout
+    # Set up the user interface components of the game
     def init_ui(self):
                 
         self.setWindowTitle('Whack-A-Mole')
@@ -44,6 +48,7 @@ class WhackAMole(QWidget):
         
 
         self.setLayout(self.layout)
+        # Shows the grid and layout
         self.show()
 
     # Creates a grid of buttons    
@@ -57,25 +62,31 @@ class WhackAMole(QWidget):
                 button.clicked.connect(lambda ch, row=row, col=col: self.button_clicked())
                 self.layout.addWidget(button, row, col)
 
+    # Function that gets called if button is clicked and checks if the mole was hit
     def button_clicked(self):
         button = self.sender()
         # Increases score if the button clicked has the 'MOLE' in it
         if button.text() == 'MOLE':
             button.setText('')
+            # Increases score by 1
             self.score += 1
+            # Updates the score label in the top left of game
             self.update_score()
+            # Randomly moves the mole to a new button
             self.move_mole()
 
     # Gets user input for a time and starts a timer for that time
     def start_timer(self):
+        # Prompts the user to input a time between 10 and 60 seconds for the game duration
         time, ok = QInputDialog.getInt(self, 'Timer', 'Enter a time between 10 and 60 seconds', min = 10, max = 60)
         if ok:
-            timer = time*1000
+            TIMER = time*1000
             # Ends game in a certain time period
-            QTimer.singleShot(timer, self.end_game)
+            QTimer.singleShot(TIMER, self.end_game)
         else:
             sys.exit(app.exec_())
 
+    # Randomly moves the mole to a new button, ensuring it doesn't select the same button twice
     def move_mole(self):
         # Clears previous MOLE button
         if self.current_mole_button:
@@ -90,7 +101,8 @@ class WhackAMole(QWidget):
                 self.current_mole_button = new_mole_button
                 self.current_mole_button.setText('MOLE')
                 break
-            
+
+    # Ends the game whenever this function is called        
     def end_game(self):
         QMessageBox.information(self, 'Game Over!', 'Game over!')
         self.get_score()
